@@ -2,6 +2,8 @@
 
 A web-based editor application similar to Canva, built with Vue 3 + TailwindCSS + TypeScript.
 
+<img width="1707" height="839" alt="image" src="https://github.com/user-attachments/assets/0333309f-f8a3-4b62-9392-6af00d9d2e24" />
+
 ## Key Features
 
 * ✅ **Canvas Engine**: Canvas with zoom, pan, and grid
