@@ -121,6 +121,12 @@ export const useDesignStore = () => {
     save();
   };
 
+  const setCanvasSize = (width: number, height: number) => {
+    designStore.canvas.width = Math.max(200, Math.min(4000, width));
+    designStore.canvas.height = Math.max(200, Math.min(4000, height));
+    save();
+  };
+
   const setPan = (x: number, y: number) => {
     designStore.canvas.panX = x;
     designStore.canvas.panY = y;
@@ -215,6 +221,7 @@ export const useDesignStore = () => {
     // Canvas operations
     updateCanvas,
     setZoom,
+    setCanvasSize,
     setPan,
     
     // History operations

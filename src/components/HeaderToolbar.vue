@@ -58,27 +58,47 @@
           <span>Import</span>
         </button>
         
-        <button
-          @click="() => exportDesign()"
-          class="flex items-center space-x-2 px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
-          title="Export design"
-        >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          <span>JSON</span>
-        </button>
-        
-        <button
-          @click="exportToImage"
-          class="flex items-center space-x-2 px-4 py-2 text-sm bg-green-500 hover:bg-green-600 text-white rounded-md transition-colors"
-          title="Export to Image"
-        >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          <span>Image</span>
-        </button>
+        <!-- Export Dropdown -->
+        <div class="relative" ref="exportDropdown">
+          <button
+            @click="toggleExportMenu"
+            class="flex items-center space-x-2 px-4 py-2 text-sm bg-green-500 hover:bg-green-600 text-white rounded-md transition-colors"
+            title="Export options"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span>Export</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          
+          <!-- Dropdown Menu -->
+          <div
+            v-if="showExportMenu"
+            class="absolute top-full right-0 mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-40 z-50"
+          >
+            <button
+              @click="handleExportJSON"
+              class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center space-x-2"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span>Export as JSON</span>
+            </button>
+            <button
+              @click="handleExportImage"
+              class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center space-x-2"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <span>Export as Image</span>
+            </button>
+          </div>
+        </div>
         
         <button
           @click="saveDesign"
@@ -125,6 +145,23 @@ const {
 } = useDesignStore();
 
 const fileInput = ref<HTMLInputElement>();
+const showExportMenu = ref(false);
+
+// Export menu functions
+const toggleExportMenu = () => {
+  showExportMenu.value = !showExportMenu.value;
+};
+
+const handleExportJSON = () => {
+  exportDesign();
+  showExportMenu.value = false;
+  console.log('Export JSON thành công!');
+};
+
+const handleExportImage = async () => {
+  showExportMenu.value = false;
+  await exportToImage();
+};
 
 // Zoom operations
 const zoomIn = () => {
@@ -219,4 +256,10 @@ const handleKeydown = (event: KeyboardEvent) => {
 
 // Add keyboard event listeners
 document.addEventListener('keydown', handleKeydown);
+</script>
+
+<script lang="ts">
+export default {
+  name: 'HeaderToolbar'
+};
 </script>

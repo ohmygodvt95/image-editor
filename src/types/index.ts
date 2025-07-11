@@ -16,6 +16,7 @@ export interface DesignObject {
     fontSize?: number;
     fontFamily?: string;
     fontWeight?: string;
+    fontStyle?: 'normal' | 'italic';
     textAlign?: 'left' | 'center' | 'right';
     color?: string;
     backgroundColor?: string;

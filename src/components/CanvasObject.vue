@@ -39,18 +39,21 @@
       <div class="absolute inset-0 border-2 border-blue-500 border-dashed rounded"></div>
       
       <!-- Resize handles -->
-      <div
-        v-for="handle in resizeHandles"
-        :key="handle.position"
-        :class="handle.classes"
-        :style="handle.style"
-        @mousedown.stop="handleResizeStart(handle.position, $event)"
-        class="pointer-events-auto"
-      ></div>
+      <template v-if="!object.props.locked">
+        <div
+          v-for="handle in resizeHandles"
+          :key="handle.position"
+          :class="handle.classes"
+          :style="handle.style"
+          @mousedown.stop="handleResizeStart(handle.position, $event)"
+          class="pointer-events-auto"
+        ></div>
+      </template>
       
       <!-- Rotation handle -->
       <div
-        class="absolute w-4 h-4 bg-white border-2 border-blue-500 rounded-full cursor-grab pointer-events-auto flex items-center justify-center"
+        v-if="!object.props.locked"
+        class="absolute w-5 h-5 bg-white border-2 border-blue-500 rounded-full cursor-grab pointer-events-auto flex items-center justify-center hover:bg-blue-50 transition-colors"
         :style="rotationHandleStyle"
         @mousedown.stop="handleRotationStart"
         title="Rotate"
@@ -60,13 +63,7 @@
         </svg>
       </div>
     </div>
-      <div
-        class="absolute w-3 h-3 bg-blue-500 rounded-full cursor-grab"
-        :style="rotationHandleStyle"
-        @mousedown.stop="handleRotationStart"
-        title="Rotate"
-      ></div>
-    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -153,7 +150,7 @@ const textStyle = computed(() => ({
   color: props.object.props.color || '#000000',
   textAlign: props.object.props.textAlign || 'left',
   overflow: 'hidden',
-  wordWrap: 'break-word',
+  wordWrap: 'break-word' as any,
   outline: 'none',
 }));
 
@@ -165,48 +162,48 @@ const imageStyle = computed(() => ({
 const resizeHandles = computed(() => [
   {
     position: 'nw',
-    classes: 'absolute w-3 h-3 bg-blue-500 rounded-full cursor-nw-resize -top-1 -left-1',
+    classes: 'absolute w-2 h-2 bg-white border border-blue-500 rounded-full cursor-nw-resize -top-1 -left-1 hover:bg-blue-50',
     style: {},
   },
   {
     position: 'ne',
-    classes: 'absolute w-3 h-3 bg-blue-500 rounded-full cursor-ne-resize -top-1 -right-1',
+    classes: 'absolute w-2 h-2 bg-white border border-blue-500 rounded-full cursor-ne-resize -top-1 -right-1 hover:bg-blue-50',
     style: {},
   },
   {
     position: 'sw',
-    classes: 'absolute w-3 h-3 bg-blue-500 rounded-full cursor-sw-resize -bottom-1 -left-1',
+    classes: 'absolute w-2 h-2 bg-white border border-blue-500 rounded-full cursor-sw-resize -bottom-1 -left-1 hover:bg-blue-50',
     style: {},
   },
   {
     position: 'se',
-    classes: 'absolute w-3 h-3 bg-blue-500 rounded-full cursor-se-resize -bottom-1 -right-1',
+    classes: 'absolute w-2 h-2 bg-white border border-blue-500 rounded-full cursor-se-resize -bottom-1 -right-1 hover:bg-blue-50',
     style: {},
   },
   {
     position: 'n',
-    classes: 'absolute w-3 h-3 bg-blue-500 rounded-full cursor-n-resize -top-1',
+    classes: 'absolute w-2 h-2 bg-white border border-blue-500 rounded-full cursor-n-resize -top-1 hover:bg-blue-50',
     style: { left: '50%', transform: 'translateX(-50%)' },
   },
   {
     position: 's',
-    classes: 'absolute w-3 h-3 bg-blue-500 rounded-full cursor-s-resize -bottom-1',
+    classes: 'absolute w-2 h-2 bg-white border border-blue-500 rounded-full cursor-s-resize -bottom-1 hover:bg-blue-50',
     style: { left: '50%', transform: 'translateX(-50%)' },
   },
   {
     position: 'w',
-    classes: 'absolute w-3 h-3 bg-blue-500 rounded-full cursor-w-resize -left-1',
+    classes: 'absolute w-2 h-2 bg-white border border-blue-500 rounded-full cursor-w-resize -left-1 hover:bg-blue-50',
     style: { top: '50%', transform: 'translateY(-50%)' },
   },
   {
     position: 'e',
-    classes: 'absolute w-3 h-3 bg-blue-500 rounded-full cursor-e-resize -right-1',
+    classes: 'absolute w-2 h-2 bg-white border border-blue-500 rounded-full cursor-e-resize -right-1 hover:bg-blue-50',
     style: { top: '50%', transform: 'translateY(-50%)' },
   },
 ]);
 
 const rotationHandleStyle = computed(() => ({
-  top: '-20px',
+  top: '-35px',
   left: '50%',
   transform: 'translateX(-50%)',
 }));
@@ -218,6 +215,12 @@ const handleClick = (event: MouseEvent) => {
 };
 
 const handleMouseDown = (event: MouseEvent) => {
+  // Don't allow dragging if object is locked
+  if (props.object.props.locked) {
+    emit('select', props.object.id);
+    return;
+  }
+  
   if (props.isSelected && event.button === 0) {
     isDragging.value = true;
     dragStart.value = {
@@ -261,6 +264,11 @@ const handleMouseUp = () => {
 
 // Resize handling
 const handleResizeStart = (position: string, event: MouseEvent) => {
+  // Don't allow resizing if object is locked
+  if (props.object.props.locked) {
+    return;
+  }
+  
   event.stopPropagation();
   isResizing.value = true;
   resizeHandle.value = position;
@@ -319,6 +327,11 @@ const handleResize = (event: MouseEvent) => {
 };
 
 const handleRotationStart = (event: MouseEvent) => {
+  // Don't allow rotation if object is locked
+  if (props.object.props.locked) {
+    return;
+  }
+  
   event.stopPropagation();
   isRotating.value = true;
   dragStart.value = { x: event.clientX, y: event.clientY };
@@ -366,5 +379,11 @@ const handleTextInput = (event: Event) => {
 
 const handleTextBlur = () => {
   // Text editing finished
+};
+</script>
+
+<script lang="ts">
+export default {
+  name: 'CanvasObject'
 };
 </script>

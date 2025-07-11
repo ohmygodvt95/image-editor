@@ -66,3 +66,9 @@ const getTabTitle = (tab: string) => {
   return tabTitles[tab as keyof typeof tabTitles] || 'Elements';
 };
 </script>
+
+<script lang="ts">
+export default {
+  name: 'ContentSidebar'
+};
+</script>

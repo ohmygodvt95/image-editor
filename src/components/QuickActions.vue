@@ -1,7 +1,7 @@
 <template>
   <div 
     v-if="visible"
-    class="absolute bg-white rounded-lg shadow-lg border border-gray-200 p-2 flex items-center space-x-1 z-50"
+    class="absolute bg-white rounded-lg shadow-lg border border-gray-200 p-2 flex items-center space-x-1"
     :style="menuStyle"
   >
     <!-- Lock Position -->
@@ -78,15 +78,36 @@ defineEmits<Emits>();
 
 const menuStyle = computed(() => {
   const scale = props.canvasZoom;
-  const objectX = props.object.props.x * scale;
-  const objectY = props.object.props.y * scale;
-  const objectWidth = (props.object.props.width || 100) * scale;
+  const objectX = props.object.props.x;
+  const objectY = props.object.props.y;
+  const objectWidth = props.object.props.width || 100;
+  const objectHeight = props.object.props.height || 100;
+  const rotation = props.object.props.rotation || 0;
+  
+  // Calculate center position of object (in canvas coordinates)
+  const centerX = objectX + (objectWidth / 2);
+  const centerY = objectY + (objectHeight / 2);
+  
+  // Distance from center to top of menu (increased to avoid rotation handle)
+  // Rotation handle is at -35px from object top, so we need more distance
+  const distance = Math.max(objectHeight / 2 + 60, 120); // Minimum 120px distance
+  
+  // Calculate position above the object
+  const menuX = centerX;
+  const menuY = centerY - distance;
   
   return {
-    left: `${objectX + objectWidth + 10}px`,
-    top: `${objectY - 10}px`,
-    transform: `scale(${1 / scale})`,
-    transformOrigin: 'left top',
+    left: `${menuX}px`,
+    top: `${menuY}px`,
+    transform: `translate(-50%, -100%)`, // Center horizontally, position above
+    transformOrigin: 'center bottom',
+    zIndex: 45, // Lower than action menu but higher than objects
   };
 });
+</script>
+
+<script lang="ts">
+export default {
+  name: 'QuickActions'
+};
 </script>

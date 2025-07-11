@@ -1,5 +1,22 @@
 <template>
-  <div class="flex-1 relative bg-gray-100 overflow-hidden flex items-center justify-center">
+  <div 
+    class="flex-1 relative bg-gray-100 overflow-hidden flex items-center justify-center"
+    @click="handleMainAreaClick"
+  >
+    <!-- Object Action Menu (positioned above canvas container) -->
+    <div
+      v-if="selectedObject"
+      class="absolute top-4 left-1/2 transform -translate-x-1/2 z-50"
+    >
+      <ObjectActionMenu
+        :selected-object="selectedObject"
+        :visible="true"
+        @update-property="handleUpdateObjectProperty"
+        @bring-to-front="handleBringToFront"
+        @send-to-back="handleSendToBack"
+      />
+    </div>
+    
     <!-- Canvas Container -->
     <div
       ref="canvasContainer"
@@ -11,8 +28,9 @@
     >
       <!-- Canvas Background -->
       <div
-        class="canvas-area border shadow-lg bg-white"
+        class="canvas-area shadow bg-white relative"
         :style="canvasStyle"
+        @click="handleCanvasAreaClick"
       >
         <!-- Grid (optional) -->
         <div v-if="showGrid" class="absolute inset-0 opacity-20">
@@ -55,7 +73,7 @@
     </div>
 
     <!-- Canvas Controls - Bottom Right -->
-    <div class="absolute bottom-4 right-4 bg-white rounded-lg shadow-lg border p-3 flex items-center space-x-4">
+    <div class="absolute bottom-4 right-4 flex items-center space-x-4">
       <!-- Grid Toggle -->
       <button
         @click="toggleGrid"
@@ -80,13 +98,13 @@
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
           </svg>
-          <span>{{ state.canvas.width }} × {{ state.canvas.height }}px</span>
-        </div>
-        <div class="flex items-center space-x-1 mt-1">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-          </svg>
-          <span>{{ state.objects.length }} objects</span>
+          <button
+            @click="openCanvasSizeModal"
+            class="hover:text-blue-600 cursor-pointer"
+            title="Change Canvas Size"
+          >
+            {{ state.canvas.width }} × {{ state.canvas.height }}px
+          </button>
         </div>
       </div>
       
@@ -123,6 +141,76 @@
         </button>
       </div>
     </div>
+
+    <!-- Canvas Size Modal -->
+    <div
+      v-if="showCanvasSizeModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    >
+      <div class="bg-white rounded-lg p-6 w-96">
+        <h3 class="text-lg font-semibold mb-4">Canvas Size</h3>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Width (px)</label>
+            <input
+              v-model.number="newCanvasWidth"
+              type="number"
+              min="200"
+              max="4000"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Height (px)</label>
+            <input
+              v-model.number="newCanvasHeight"
+              type="number"
+              min="200"
+              max="4000"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          
+          <div class="flex space-x-2">
+            <button
+              @click="newCanvasWidth = 800; newCanvasHeight = 600"
+              class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded"
+            >
+              Default
+            </button>
+            <button
+              @click="newCanvasWidth = 1920; newCanvasHeight = 1080"
+              class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded"
+            >
+              HD
+            </button>
+            <button
+              @click="newCanvasWidth = 1080; newCanvasHeight = 1080"
+              class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded"
+            >
+              Square
+            </button>
+          </div>
+        </div>
+        
+        <div class="flex justify-end space-x-2 mt-6">
+          <button
+            @click="showCanvasSizeModal = false"
+            class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800"
+          >
+            Cancel
+          </button>
+          <button
+            @click="applyCanvasSize"
+            class="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            Apply
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -131,6 +219,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useDesignStore } from '../store/design';
 import CanvasObject from './CanvasObject.vue';
 import QuickActions from './QuickActions.vue';
+import ObjectActionMenu from './ObjectActionMenu.vue';
 
 const {
   state,
@@ -142,6 +231,7 @@ const {
   addObject,
   setPan,
   setZoom,
+  setCanvasSize,
   getSelectedObject,
 } = useDesignStore();
 
@@ -149,6 +239,21 @@ const canvasContainer = ref<HTMLElement>();
 const showGrid = ref(true);
 const isPanning = ref(false);
 const lastPanPoint = ref({ x: 0, y: 0 });
+const showCanvasSizeModal = ref(false);
+const newCanvasWidth = ref(800);
+const newCanvasHeight = ref(600);
+
+// Canvas size functions
+const openCanvasSizeModal = () => {
+  newCanvasWidth.value = state.canvas.width;
+  newCanvasHeight.value = state.canvas.height;
+  showCanvasSizeModal.value = true;
+};
+
+const applyCanvasSize = () => {
+  setCanvasSize(newCanvasWidth.value, newCanvasHeight.value);
+  showCanvasSizeModal.value = false;
+};
 
 // Zoom functions
 const zoomIn = () => {
@@ -187,8 +292,12 @@ const colorValue = computed({
   set: (value: string) => {
     const obj = selectedObject.value;
     if (obj) {
-      const prop = obj.type === 'text' ? 'color' : 'fill';
-      updateObject(obj.id, { props: { ...obj.props, [prop]: value } });
+      if (obj.type === 'text') {
+        updateObject(obj.id, { props: { ...obj.props, color: value } });
+      } else {
+        // For shapes, update both fill and stroke to keep consistent colors
+        updateObject(obj.id, { props: { ...obj.props, fill: value, stroke: value } });
+      }
     }
   }
 });
@@ -196,12 +305,17 @@ const colorValue = computed({
 // Canvas interactions
 const handleCanvasMouseDown = (event: MouseEvent) => {
   if (event.target === canvasContainer.value || event.target === event.currentTarget) {
-    selectObject(null);
-    
     if (event.button === 0 && !event.ctrlKey && !event.metaKey) {
       isPanning.value = true;
       lastPanPoint.value = { x: event.clientX, y: event.clientY };
     }
+  }
+};
+
+const handleCanvasAreaClick = (event: MouseEvent) => {
+  // Only deselect if clicking directly on the canvas area (not on objects)
+  if (event.target === event.currentTarget) {
+    selectObject(null);
   }
 };
 
@@ -221,11 +335,31 @@ const handleCanvasMouseUp = () => {
 };
 
 const handleWheel = (event: WheelEvent) => {
+  // Only zoom when Ctrl key is pressed
+  if (!event.ctrlKey) {
+    return;
+  }
+  
   event.preventDefault();
   
+  // Get mouse position relative to canvas
+  const canvasRect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+  const mouseX = event.clientX - canvasRect.left;
+  const mouseY = event.clientY - canvasRect.top;
+  
+  // Convert to canvas coordinates before zoom
+  const canvasMouseX = (mouseX - state.canvas.panX) / state.canvas.zoom;
+  const canvasMouseY = (mouseY - state.canvas.panY) / state.canvas.zoom;
+  
   const delta = event.deltaY > 0 ? 0.9 : 1.1;
-  const newZoom = state.canvas.zoom * delta;
+  const newZoom = Math.max(0.1, Math.min(5, state.canvas.zoom * delta));
+  
+  // Calculate new pan to keep mouse position fixed
+  const newPanX = mouseX - canvasMouseX * newZoom;
+  const newPanY = mouseY - canvasMouseY * newZoom;
+  
   setZoom(newZoom);
+  setPan(newPanX, newPanY);
 };
 
 // Object operations
@@ -311,8 +445,51 @@ const deleteSelected = () => {
   }
 };
 
+const handleUpdateObjectProperty = (property: string, value: any) => {
+  const obj = selectedObject.value;
+  if (obj) {
+    updateObject(obj.id, {
+      props: {
+        ...obj.props,
+        [property]: value
+      }
+    });
+  }
+};
+
+const handleBringToFront = () => {
+  const obj = selectedObject.value;
+  if (obj) {
+    moveObjectToFront(obj.id);
+  }
+};
+
+const handleSendToBack = () => {
+  const obj = selectedObject.value;
+  if (obj) {
+    moveObjectToBack(obj.id);
+  }
+};
+
 // Grid toggle
 const toggleGrid = () => {
   showGrid.value = !showGrid.value;
+};
+
+const handleMainAreaClick = (event: MouseEvent) => {
+  // Check if click is outside canvas-area (white canvas)
+  const canvasArea = canvasContainer.value?.querySelector('.canvas-area');
+  const actionMenu = (event.target as Element)?.closest('[class*="absolute"][class*="top-4"]');
+  
+  // If clicking outside canvas area and not on action menu, deselect
+  if (canvasArea && !canvasArea.contains(event.target as Node) && !actionMenu) {
+    selectObject(null);
+  }
+};
+</script>
+
+<script lang="ts">
+export default {
+  name: 'CanvasArea'
 };
 </script>

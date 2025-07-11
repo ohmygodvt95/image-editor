@@ -398,3 +398,9 @@ const flipImage = (direction: 'horizontal' | 'vertical') => {
   console.log(`Flip image ${direction}`);
 };
 </script>
+
+<script lang="ts">
+export default {
+  name: 'PropertiesPanel'
+};
+</script>
