@@ -1,41 +1,42 @@
 # Canva Editor Clone
 
-Một ứng dụng web editor giống Canva được xây dựng với Vue 3 + TailwindCSS + TypeScript.
+A web-based editor application similar to Canva, built with Vue 3 + TailwindCSS + TypeScript.
 
-## Tính năng chính
+## Key Features
 
-- ✅ **Canvas Engine**: Canvas với zoom, pan, grid
-- ✅ **Object Management**: Thêm, chỉnh sửa, xóa objects
-- ✅ **Shape Tools**: Rectangle, Circle, Triangle, Star, Line
-- ✅ **Text Tools**: Multiple text styles, fonts, formatting
-- ✅ **Image Upload**: Upload ảnh từ máy tính và URL
-- ✅ **Templates**: Predefined templates cho social media, business, etc.
-- ✅ **Transform Controls**: Drag, resize, rotate objects
-- ✅ **Layer Management**: Z-index, bring to front/back
-- ✅ **Undo/Redo**: History management
-- ✅ **Local Storage**: Tự động lưu design
-- ✅ **Export/Import**: JSON format
-- ✅ **Responsive UI**: Modern, clean interface
+* ✅ **Canvas Engine**: Canvas with zoom, pan, and grid
+* ✅ **Object Management**: Add, edit, and delete objects
+* ✅ **Shape Tools**: Rectangle, Circle, Triangle, Star, Line
+* ✅ **Text Tools**: Multiple text styles, fonts, and formatting
+* ✅ **Image Upload**: Upload images from your computer or via URL
+* ✅ **Templates**: Predefined templates for social media, business, etc.
+* ✅ **Transform Controls**: Drag, resize, and rotate objects
+* ✅ **Layer Management**: Z-index controls, bring objects to front/back
+* ✅ **Undo/Redo**: History management
+* ✅ **Local Storage**: Automatic design saving
+* ✅ **Export/Import**: JSON format
+* ✅ **Responsive UI**: Modern, clean interface
 
-## Hướng dẫn sử dụng
+## How to Use
 
-1. **Thêm Elements**: Click vào sidebar tabs để thêm shapes, text, hoặc upload images
-2. **Chỉnh sửa**: Click vào object để select, drag để move, dùng handles để resize
-3. **Properties Panel**: Chỉnh sửa properties trong panel bên phải khi select object
+1. **Add Elements**: Click the sidebar tabs to add shapes, text, or upload images
+2. **Edit**: Click an object to select it, drag to move, and use handles to resize
+3. **Properties Panel**: Edit properties in the right-hand panel when an object is selected
 4. **Keyboard Shortcuts**:
-   - `Ctrl+Z`: Undo
-   - `Ctrl+Y`: Redo
-   - `Delete`: Delete selected object
-   - `Ctrl+D`: Duplicate object
-   - `Arrow keys`: Move object (Shift for 10px steps)
+
+   * `Ctrl+Z`: Undo
+   * `Ctrl+Y`: Redo
+   * `Delete`: Delete selected object
+   * `Ctrl+D`: Duplicate object
+   * `Arrow keys`: Move object (hold Shift for 10px increments)
 
 ## Tech Stack
 
-- **Vue 3**: Composition API, TypeScript
-- **TailwindCSS v4**: Modern styling
-- **Vite**: Fast build tool
-- **TypeScript**: Type safety
-- **LocalStorage**: Data persistence
+* **Vue 3**: Composition API, TypeScript
+* **TailwindCSS v4**: Modern styling
+* **Vite**: Fast build tool
+* **TypeScript**: Type safety
+* **LocalStorage**: Data persistence
 
 ## Development
 
@@ -44,4 +45,4 @@ npm install
 npm run dev
 ```
 
-Mở http://localhost:5173 để xem ứng dụng.
+Open [http://localhost:5173](http://localhost:5173) to view the application.
